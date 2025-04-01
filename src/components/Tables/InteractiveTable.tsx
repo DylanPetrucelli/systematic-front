@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import NumberScaleModal from "../Modals/Data Extraciton Field Creation/NumberScaleModal";
 import PickListModal from "../Modals/Data Extraciton Field Creation/PickListModal";
 import LabeledScaleModal from "../Modals/Data Extraciton Field Creation/labeledScale";
+import getRequestOptions from "../../utils/getRequestOptions";
 
 interface Props{
   id: string;
@@ -23,7 +24,7 @@ if(label == 'Extraction Questions') adress = 'extraction-question';
 
 if(label == 'Risk of Bias Questions') adress = 'rob-question';
   
-  const { setRows, rows, addRow, handleDelete, handleQuestionChange, handleTypeChange, options, headers, 
+  const { setRows, rows, addRow, handleDelete, handleQuestionChange, handleUserCodeChange, handleTypeChange, options, headers, 
     handleServerSend, handleAddQuestions, handleNumberScale, handleLabeledList } =
     useInteractiveTable();
   const { sendTextualQuestion, sendPickListQuestion, sendNumberScaleQuestion, sendLabeledListQuestion, updateTextualQuestion,
@@ -45,18 +46,15 @@ if(label == 'Risk of Bias Questions') adress = 'rob-question';
 
     const fetch = async () => {
       try {
-        const accessToken = localStorage.getItem('accessToken');
-        let options = {
-          headers: { Authorization: `Bearer ${accessToken}` }
-        }
+        const options = getRequestOptions();
 
         let response = await axios.get(url, options);
   
-        let link = `http://localhost:8080/api/v1/systematic-study/${id}/protocol/${adress}`;
+        const link = `http://localhost:8080/api/v1/systematic-study/${id}/protocol/${adress}`;
         response = await axios.get(link, options);
   
-        const fetchedRows = response.data.questions.map((item: { questionType: any; code: any; 
-          description: any; questionId: string; options: string[], lower: number, 
+        const fetchedRows = response.data.questions.map((item: { questionType: string; code: string; title: string;
+          description: string; questionId: string; options: string[], lower: number, 
           higher: number, scales: Record<string, number>}) => {
           let type;
           let questions;
@@ -79,10 +77,11 @@ if(label == 'Risk of Bias Questions') adress = 'rob-question';
           }
   
           return {
-            id: item.code,
+            userCode: item.code,
             question: item.description,
             type: type,
             questionId: item.questionId,
+            title: item.title,
             isNew: false,
             questions: questions,
             higher: item.higher,
@@ -114,18 +113,18 @@ if(label == 'Risk of Bias Questions') adress = 'rob-question';
   }
 
   async function handleSaveEdit(index: number) {
-    console.log(rows[index].question, rows[index].type, rows[index].id);
+    console.log(rows[index].question, rows[index].type, rows[index].userCode);
     if(rows[index].type == "textual"){
       const data = {
         question: rows[index].question,
-        questionId: rows[index].id,
+        userCode: rows[index].userCode,
         reviewId: id
       }
 
       let questionId
-      let questionType = 'TEXTUAL';
+      const questionType = 'TEXTUAL';
       if(rows[index].isNew) questionId = await sendTextualQuestion(data);
-      else updateTextualQuestion(data, rows[index].questionId, questionType);
+      else updateTextualQuestion(data, rows[index].userCode, questionType);
       
       handleServerSend(index, questionId);
 
@@ -134,7 +133,7 @@ if(label == 'Risk of Bias Questions') adress = 'rob-question';
     else if(rows[index].type == "pick list"){
       const data = {
           question: rows[index].question,
-          questionId: rows[index].id,
+          userCode: rows[index].userCode,
           reviewId: id,
           options: questions
       }   
@@ -142,7 +141,7 @@ if(label == 'Risk of Bias Questions') adress = 'rob-question';
       handleAddQuestions(index, questions);
       let questionId
       if(rows[index].isNew) questionId = await sendPickListQuestion(data);
-      else updatePickListQuestion(data, rows[index].questionId, "PICK_LIST");
+      else updatePickListQuestion(data, rows[index].userCode, "PICK_LIST");
       handleServerSend(index, questionId);
     }
     
@@ -150,7 +149,7 @@ if(label == 'Risk of Bias Questions') adress = 'rob-question';
       console.log(rows[index]);
       const data = {
         question: rows[index].question,
-        questionId: rows[index].id,
+        userCode: rows[index].userCode,
         reviewId: id,
         lower: numberScale[0],
         higher: numberScale[1]
@@ -161,14 +160,14 @@ if(label == 'Risk of Bias Questions') adress = 'rob-question';
       handleNumberScale(index, numberScale[0], numberScale[1]);
       let questionId
       if(rows[index].isNew) questionId = await sendNumberScaleQuestion(data);
-      else updateNumberScaleQuestion(data, rows[index].questionId);
+      else updateNumberScaleQuestion(data, rows[index].userCode);
       handleServerSend(index, questionId);
     }
 
     else if(rows[index].type == "labeled list"){
       const data = {
         question: rows[index].question,
-        questionId: rows[index].id,
+        userCode: rows[index].userCode,
         reviewId: id,
         scales: labeledQuestions
       }
@@ -176,14 +175,11 @@ if(label == 'Risk of Bias Questions') adress = 'rob-question';
       handleLabeledList(index, labeledQuestions);
       let questionId 
       if(rows[index].isNew) questionId = await sendLabeledListQuestion(data);
-      else updateLabeledListQuestion(data, rows[index].questionId);
+      else updateLabeledListQuestion(data, rows[index].userCode);
       handleServerSend(index, questionId);
     }
 
-    const accessToken = localStorage.getItem('accessToken');
-    let options = {
-      headers: { Authorization: `Bearer ${accessToken}` }
-    }
+    const options = getRequestOptions();
     
     setEditIndex(null);
     await axios.get(`http://localhost:8080/api/v1/systematic-study/${id}/protocol/extraction-question`, options);
@@ -207,7 +203,10 @@ if(label == 'Risk of Bias Questions') adress = 'rob-question';
         <Tbody>
           { rows.map((row, index) => (
             <Tr key={index} bgColor={"#C9D9E5"}>
-              <Td>{row.id}</Td>
+              <Td>
+                <Input value={row.userCode} onChange={(e) => handleUserCodeChange(index, e.target.value)}
+                  border={"solid 1px #303D50"} />
+              </Td>
               <Td>
                 <Input value={row.question} onChange={(e) => handleQuestionChange(index, e.target.value)}
                 border={"solid 1px #303D50"} />

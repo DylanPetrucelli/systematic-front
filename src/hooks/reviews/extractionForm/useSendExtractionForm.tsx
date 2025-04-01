@@ -2,20 +2,23 @@ import axios from "../../../interceptor/interceptor";
 
 interface TextualProps{
     question: string;
-    questionId: number;
+    questionId: string;
+    userCode: string;
     reviewId: string;
 }
 
 interface PickListProps{
     question: string;
-    questionId: number;
+    questionId: string;
+    userCode: string;
     reviewId: string;
     options: string[];
 }
 
 interface NumberScaleProps{
     question: string;
-    questionId: number;
+    questionId: string;
+    userCode: string;
     reviewId: string;
     lower: number,
     higher: number
@@ -23,16 +26,17 @@ interface NumberScaleProps{
 
 interface LabeledProps{
     question: string;
-    questionId: number;
+    questionId: string; //uuid
+    userCode: string;
     reviewId: string;
     scales: Record<string, number>;
 }
 
 const useSendExtractionForm = (adress: string) => {
-    async function sendTextualQuestion({question, questionId, reviewId}: TextualProps){
+    async function sendTextualQuestion({question, userCode, reviewId}: TextualProps){
         let url = `http://localhost:8080/api/v1/systematic-study/${reviewId}/protocol/${adress}/textual`;
         const data = {
-            code: questionId,
+            code: userCode,
             description: question
         }
 
@@ -45,10 +49,10 @@ const useSendExtractionForm = (adress: string) => {
         }
     }
 
-    async function sendPickListQuestion({question, questionId, reviewId, options}: PickListProps){
+    async function sendPickListQuestion({question, userCode, reviewId, options}: PickListProps){
         let url = `http://localhost:8080/api/v1/systematic-study/${reviewId}/protocol/${adress}/pick-list`;
         const data = {
-            code: questionId,
+            code: userCode,
             description: question,
             options
         }
@@ -62,12 +66,12 @@ const useSendExtractionForm = (adress: string) => {
         }
     }
 
-    async function sendNumberScaleQuestion({question, questionId, reviewId, lower, higher}: NumberScaleProps){
+    async function sendNumberScaleQuestion({question, userCode, reviewId, lower, higher}: NumberScaleProps){
         let url = `http://localhost:8080/api/v1/systematic-study/${reviewId}/protocol/${adress}/number-scale`;
         console.log(typeof(lower));
         
         const data = {
-            code: questionId,
+            code: userCode,
             description: question,
             lower: lower,
             higher: higher
@@ -84,10 +88,10 @@ const useSendExtractionForm = (adress: string) => {
         }
     }
 
-    async function sendLabeledListQuestion({question, questionId, reviewId, scales}: LabeledProps) {
+    async function sendLabeledListQuestion({question, userCode, reviewId, scales}: LabeledProps) {
         let url = `http://localhost:8080/api/v1/systematic-study/${reviewId}/protocol/${adress}/labeled-scale`;
         const data = {
-            code: questionId,
+            code: userCode,
             description: question,
             scales
         }
@@ -101,11 +105,11 @@ const useSendExtractionForm = (adress: string) => {
         }
     }
 
-    async function updateTextualQuestion({question, questionId, reviewId}: TextualProps, serverId: string | null, questionType: string){
+    async function updateTextualQuestion({question, userCode, reviewId}: TextualProps, serverId: string | null, questionType: string){
         let url = `http://localhost:8080/api/v1/systematic-study/${reviewId}/protocol/${adress}/${serverId}`;
         const data = {
             questionType: questionType,
-            code: questionId,
+            code: userCode,
             description: question
         }
 
@@ -118,11 +122,11 @@ const useSendExtractionForm = (adress: string) => {
         }
     }
 
-    async function updatePickListQuestion({question, questionId, reviewId, options}: PickListProps, serverId: string | null, questionType: string){
+    async function updatePickListQuestion({question, userCode, reviewId, options}: PickListProps, serverId: string | null, questionType: string){
         let url = `http://localhost:8080/api/v1/systematic-study/${reviewId}/protocol/${adress}/${serverId}`;
         const data = {
             questionType: questionType,
-            code: questionId,
+            code: userCode,
             description: question,
             options
         }
@@ -136,12 +140,12 @@ const useSendExtractionForm = (adress: string) => {
         }
     }
 
-    async function updateNumberScaleQuestion({question, questionId, reviewId, lower, higher}: NumberScaleProps, serverId: string | null){
+    async function updateNumberScaleQuestion({question, userCode, reviewId, lower, higher}: NumberScaleProps, serverId: string | null){
         let url = `http://localhost:8080/api/v1/systematic-study/${reviewId}/protocol/${adress}/${serverId}`;
         console.log(typeof(lower));
         
         const data = {
-            code: questionId,
+            code: userCode,
             description: question,
             lower: lower,
             higher: higher,
@@ -157,10 +161,10 @@ const useSendExtractionForm = (adress: string) => {
         }
     }
 
-    async function updateLabeledListQuestion({question, questionId, reviewId, scales}: LabeledProps, serverId: string | null) {
+    async function updateLabeledListQuestion({question, userCode, reviewId, scales}: LabeledProps, serverId: string | null) {
         let url = `http://localhost:8080/api/v1/systematic-study/${reviewId}/protocol/${adress}/${serverId}`;
         const data = {
-            code: questionId,
+            code: userCode,
             description: question,
             scales,
             questionType: 'LABELED_SCALE'
