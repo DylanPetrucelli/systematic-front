@@ -51,9 +51,10 @@ export default function Header({ show }: IHeaderProps) {
 
       <Flex sx={HeaderTheme}>
         <Flex width="auto" gap="10%" alignItems={"center"}>
-          <Box>
+          <Box flexShrink={0}>
             <Link to={"/"}>
-              <Image src={Logo} alt="Start Logo" />
+              <Image src={Logo} alt="Start Logo"
+              boxSize={"50%"}/>
             </Link>
           </Box>
           {showLinks && (
@@ -66,7 +67,7 @@ export default function Header({ show }: IHeaderProps) {
             </Flex>
           )}
         </Flex>
-        <Flex gap="5%">
+        <Flex gap="5%" backgroundColor={"#301E1A"} position={"absolute"} right={"1vw"}>
           {!username && <Button
            _hover={{ color: "black", backgroundColor: "white" }}
             color={openModal == "signup" && showModal ? "black" : "white"}
