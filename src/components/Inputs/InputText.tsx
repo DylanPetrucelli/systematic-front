@@ -10,9 +10,10 @@ interface ITextFieldProps {
   onChange: (value: React.ChangeEvent<HTMLInputElement>) => void;
   labelAbove?: boolean; 
   value?: string;
+  bgColor?: string;
 }
 
-export default function InputText({ label, placeholder, type, nome, onChange, labelAbove, value }: ITextFieldProps) {
+export default function InputText({ label, placeholder, type, nome, onChange, labelAbove, value, bgColor }: ITextFieldProps) {
   const isSearchField = type === "search";
 
   return (
@@ -35,7 +36,7 @@ export default function InputText({ label, placeholder, type, nome, onChange, la
           name={nome}
           placeholder={placeholder}
           w={isSearchField ? "250px" : "100%"}
-          bgColor={"#EBF0F3"}
+          bgColor={bgColor || "#EBF0F3"}
           borderRadius={"3px"}
           _placeholder={{ opacity: 1, color: "gray.500" }}
           focusBorderColor="#2E4B6C"

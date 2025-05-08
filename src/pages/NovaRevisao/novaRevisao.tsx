@@ -21,7 +21,7 @@ export default function NovaRevisao() {
 
       <FormControl m={"20px auto 0"} display={"flex"} gap={10} flexDir={"column"} w={"60vw"} alignItems={"center"} >
         
-        { isTitleValid ? <InputText value={title} label="Title" placeholder="Enter review title" type="text" nome="text" onChange={handleTitle} labelAbove={true}/> 
+        { isTitleValid ? <InputText value={title} label="Title" placeholder="Enter review title" type="text" nome="text" onChange={handleTitle} labelAbove={true} bgColor="#C9D9E5"/> 
         : <AlertInputText border="red" value={title} label="Title is required" placeholder="Enter review title" type="text" nome="text" onChange={handleTitle} labelAbove={true} /> }
         
         <InputTextArea value={description} label="Description" placeholder="Enter review description" onChange={handleDescription}></InputTextArea>
